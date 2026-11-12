@@ -1,5 +1,5 @@
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.*; //InetAddress, UnknownHostException, URI
+import java.net.http.*; //HttpClient, HttpRequest, HttpResponse
 
 public class NetworkInspector {
     public static void main(String[] args) {
@@ -23,12 +23,34 @@ public class NetworkInspector {
             //empty line for output separation
             System.out.println();
             
-        // TODO:build HttpClient (with redirects) and HttpRequest for https://<hostname>
-        //send request and capture HttpResponse(bytes[])
+            //build HttpClient (with redirects) 
+            HttpClient clnt = HttpClient.newBuilder()
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .build();
+             //build HttpRequest for https://<hostname>
+             HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create("https://" + hostname))
+                 .GET()
+                .build();
+            
+            //send request and capture HttpResponse<byte[]>
+            HttpResponse<byte[]> resp = clnt.send(req, HttpResponse.BodyHandlers.ofByteArray());
 
-        // TODO: extract and print status code, TLS protocol from sslSession(), and response body length in bytes
+            //extract status code, TLS version, and response size in bytes
+            int statusCode = resp.statusCode();
+            String tlsVersion = resp.sslSession().get().getProtocol();
+            int responseSize = resp.body().length;
+
+            //print status code, TLS version, and response size in bytes
+            System.out.println("HTTPS Connection Successful\n");
+            System.out.println("Status Code:\n" + statusCode + "\n");
+            System.out.println("TLS Version:\n" + tlsVersion + "\n");
+            System.out.println("Response Size:\n" + responseSize + " bytes");
+
         } catch (UnknownHostException e){
             System.err.println("Error: Could not resolve " + hostname);
+        }catch (Exception e) {
+            System.err.println("Error connecting to " + hostname + " - " + e.getMessage());
         }
 
     }
