@@ -7,7 +7,6 @@ The goal is to connect concepts from class such as DNS, IP addresses, HTTP, HTTP
 javac NetworkInspector.java
 java NetworkInspector <hostname>
 ```
-### Testing jar
 ### Sample Run
 ```bash
 java NetworkInspector microsoft.com
